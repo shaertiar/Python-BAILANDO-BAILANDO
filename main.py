@@ -1,16 +1,17 @@
 import pygame as pg
 import gif_pygame as gifpg
+import os
 
 # Иниацилизация
 pg.init()
 
 # Переменные 
 is_game = True
-RES = WW, WH = 360, 260
+RES = WW, WH = 370, 260
 clock = pg.time.Clock()
 FPS = 10
 is_pause  = False
-frames = 0
+volume = 20
 
 # Звуки
 pg.mixer.music.load('src/music.mp3')
@@ -37,7 +38,11 @@ def blit_pause():
 # Игровой цикл
 while is_game:
     # Отображение gif
-    window.fill((255, 255, 255))
+    try: 
+        window.blit(pg.transform.scale(pg.image.load('src/NTBG.png'), (360, 280)), (0, 0))
+        window.blit(pg.transform.scale(pg.image.load('src/BG.png'), (360, 280)), (0, 0))
+    except: 
+        window.fill((255, 255, 255))
     gif.render(window, (0, 0))
     
     # Обработка событий
@@ -48,6 +53,7 @@ while is_game:
             
         # Обработка нажатия клавиши
         if event.type == pg.KEYDOWN:
+            # Пазуа
             if event.key == pg.K_SPACE:
                 is_pause = not is_pause
                 
@@ -58,10 +64,33 @@ while is_game:
                 else:
                     pg.mixer.music.unpause()
                     gif.unpause()
+            
+            # Увеличение и уменьшение звука
+            elif event.key == pg.K_UP:
+                volume += 1
+                if volume > 20: volume = 20
+                
+                pg.mixer.music.set_volume(volume/20)
+                
+            elif event.key == pg.K_DOWN:
+                volume -= 1
+                if volume < 0: volume = 0
+                
+                pg.mixer.music.set_volume(volume/20)
+                
+            # Перезапуск
+            elif event.key == pg.K_r:
+                pg.mixer.music.play(-1)
+                gif = gifpg.load('src/konata-dance.gif')
+                is_pause = False
                     
     # Отображение пацзы
     if is_pause:
         blit_pause()
+        
+    # Отображение звука
+    pg.draw.rect(window, (255, 255, 255), (360, 0, 10, 260))
+    pg.draw.rect(window, (128, 128, 128), (360, 0, 10, 260-volume*13))
 
     # Обновление экрана
     pg.display.update()
