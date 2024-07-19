@@ -1,6 +1,5 @@
 import pygame as pg
 import gif_pygame as gifpg
-import os
 
 # Иниацилизация
 pg.init()
